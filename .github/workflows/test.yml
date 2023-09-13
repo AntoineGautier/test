@@ -57,16 +57,9 @@ jobs:
         run : "echo $GITHUB_EVENT_PATH"
 
       - name: Push binaries
-        if: |
-          contains(matrix.os, 'latest') &&
-          contains(matrix.python-version, '3.9') &&
-          ${{ github.event.name == 'push' }} &&
-          ${{ github.ref == 'refs/heads/master' }}
+        if: contains(matrix.os, 'latest') && contains(matrix.python-version, '3.9') && ${{ github.event.name == 'push' }} && ${{ github.ref == 'refs/heads/master' }}
         run: |
           git config --global user.name $GH_USERNAME
           git config --global user.email $GH_USERNAME@users.noreply.github.com
           git config --global pull.rebase false
           git pull
-          git add ${{ github.workspace }}/pyfunnel/lib
-          git diff-index --quiet HEAD || git commit -m "Add ${{ matrix.os }} binaries"
-          git push
