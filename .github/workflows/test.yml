@@ -26,17 +26,17 @@ jobs:
       - name: Debug
         run: |
           echo "github.event.pull_request.merged : $MERGED_RAW"
-          echo "contains(matrix.os, 'latest') && contains(matrix.python-version, '3.9') && github.event.pull_request.merged : $ALL"
+          echo "contains(matrix.os, 'latest') && contains(matrix.python-version, '3.9') && (github.event.pull_request.merged == true) : $ALL"
           echo "github.event.pull_request.merged  == true  : $MERGED_TRUE_BOOL"
           echo "contains(matrix.os, 'latest') && contains(matrix.python-version, '3.9') : $ALL_MAT"
         env:
           MERGED_RAW: ${{ github.event.pull_request.merged }}
-          ALL: ${{ contains(matrix.os, 'latest') && contains(matrix.python-version, '3.9') && github.event.pull_request.merged }}
+          ALL: ${{ contains(matrix.os, 'latest') && contains(matrix.python-version, '3.9') && (github.event.pull_request.merged == true) }}
           MERGED_TRUE_BOOL: ${{ github.event.pull_request.merged == true }}
           ALL_MAT: ${{ contains(matrix.os, 'latest') && contains(matrix.python-version, '3.9') }}
 
       - name: Push binaries
-        if: contains(matrix.os, 'latest') && contains(matrix.python-version, '3.9') && github.event.pull_request.merged
+        if: contains(matrix.os, 'latest') && contains(matrix.python-version, '3.9') && (github.event.pull_request.merged == true)
         run: |
           git config --global user.name $GH_USERNAME
           git config --global user.email $GH_USERNAME@users.noreply.github.com
