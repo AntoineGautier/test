@@ -38,8 +38,8 @@ jobs:
           echo "contains(matrix.os, 'latest') && contains(matrix.python-version, '3.9') : $ALL_MAT"
         env:
           MERGED_RAW: ${{ github.event.pull_request.merged }}
-          ALLPAR: ${{ contains(matrix.os, 'latest') && contains(matrix.python-version, '3.9') && (github.event.pull_request.merged == true)}}
-          ALL: ${{ contains(matrix.os, 'latest') && contains(matrix.python-version, '3.9') && github.event.pull_request.merged == true }}
+          ALLPAR: ${{ contains(matrix.os, 'latest') && contains(matrix.python-version, '3.9') && contains(github.event.name, 'push') && contains(github.ref, 'refs/heads/master') }}
+          ALL: ${{ contains(matrix.os, 'latest') && contains(matrix.python-version, '3.9') && (github.event.name == 'push') && (github.ref == 'refs/heads/master') }}
           MERGED_TRUE_BOOL: ${{ github.event.pull_request.merged == true }}
           ALL_MAT: ${{ contains(matrix.os, 'latest') && contains(matrix.python-version, '3.9') }}
 
@@ -51,18 +51,21 @@ jobs:
         run : "echo $GITHUB_HEAD_REF"
       - name : machine echo $GITHUB_REF
         run : "echo $GITHUB_REF"
-      - name : machine echo $GITHUB_SHA
-        run : "echo $GITHUB_SHA"
-      - name : machine echo $GITHUB_EVENT_PATH
-        run : "echo $GITHUB_EVENT_PATH"
+      - name : machine echo 1
+        run : "echo ${{ github.event.name == 'push' }}"
+      - name : machine echo 2
+        run : "echo ${{ github.ref == 'refs/heads/master' }}"
 
       - name: Push binaries
-        if: ${{ github.event.name == 'push' }} && ${{ github.ref == 'refs/heads/master' }}
+        if: |
+          contains(matrix.os, 'latest') &&
+          contains(matrix.python-version, '3.9') &&
+          (github.event.name == 'push') &&
+          (github.ref == 'refs/heads/master')
         run: |
           git config --global user.name $GH_USERNAME
           git config --global user.email $GH_USERNAME@users.noreply.github.com
           git config --global pull.rebase false
           git pull
-          git add ${{ github.workspace }}/pyfunnel/lib
-          git diff-index --quiet HEAD || git commit -m "Add ${{ matrix.os }} binaries"
+          git diff-index --quiet HEAD || git commit --allow-empty -m "Add ${{ matrix.os }} binaries"
           git push
