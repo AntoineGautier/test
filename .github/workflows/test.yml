@@ -50,16 +50,14 @@ jobs:
       - name : machine echo $GITHUB_HEAD_REF
         run : "echo $GITHUB_HEAD_REF"
       - name : machine echo $GITHUB_REF
-        run : |
-          "echo $GITHUB_REF"
-          "echo ${{ github.event.push.ref }}"
+        run : "echo $GITHUB_REF"
       - name : machine echo $GITHUB_SHA
         run : "echo $GITHUB_SHA"
       - name : machine echo $GITHUB_EVENT_PATH
         run : "echo $GITHUB_EVENT_PATH"
 
       - name: Push binaries
-        if: $GITHUB_EVENT_NAME == 'push' && ${{ github.event.push.ref }} == 'master'
+        if: $GITHUB_EVENT_NAME == 'push' && $GITHUB_REF == 'master'
         run: |
           git config --global user.name $GH_USERNAME
           git config --global user.email $GH_USERNAME@users.noreply.github.com
