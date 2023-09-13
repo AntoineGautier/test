@@ -19,29 +19,15 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: ['3.9']
 
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-
       - name: Debug
         run: |
-          echo "github.event.pull_request.merged : $MERGED_RAW"
-          echo "contains(matrix.os, 'latest') && contains(matrix.python-version, '3.9') && (github.event.pull_request.merged == true) : $ALLPAR"
-          echo "contains(matrix.os, 'latest') && contains(matrix.python-version, '3.9') && github.event.pull_request.merged == true : $ALL"
-          echo "github.event.pull_request.merged  == true  : $MERGED_TRUE_BOOL"
-          echo "contains(matrix.os, 'latest') && contains(matrix.python-version, '3.9') : $ALL_MAT"
-        env:
-          MERGED_RAW: ${{ github.event.pull_request.merged }}
-          ALLPAR: ${{ contains(matrix.os, 'latest') && contains(matrix.python-version, '3.9') && contains(github.event.name, 'push') && contains(github.ref, 'refs/heads/master') }}
-          ALL: ${{ contains(matrix.os, 'latest') && contains(matrix.python-version, '3.9') && (github.event.name == 'push') && (github.ref == 'refs/heads/master') }}
-          MERGED_TRUE_BOOL: ${{ github.event.pull_request.merged == true }}
-          ALL_MAT: ${{ contains(matrix.os, 'latest') && contains(matrix.python-version, '3.9') }}
+          echo ${{ github.event_name == 'push' }}
+          echo ${{ github.event_name }}
+          echo ${{ github.ref }}
 
       - name : machine echo $GITHUB_EVENT_NAME
         run : "echo $GITHUB_EVENT_NAME"
@@ -59,9 +45,8 @@ jobs:
       - name: Push binaries
         if: |
           contains(matrix.os, 'latest') &&
-          contains(matrix.python-version, '3.9') &&
-          (github.event.name == 'push') &&
-          (github.ref == 'refs/heads/master')
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/master'
         run: |
           git config --global user.name $GH_USERNAME
           git config --global user.email $GH_USERNAME@users.noreply.github.com
