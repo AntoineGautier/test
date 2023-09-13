@@ -51,10 +51,12 @@ jobs:
         run : "echo $GITHUB_HEAD_REF"
       - name : machine echo $GITHUB_REF
         run : "echo $GITHUB_REF"
-      - name : machine echo $GITHUB_SHA
-        run : "echo $GITHUB_SHA"
-      - name : machine echo $GITHUB_EVENT_PATH
-        run : "echo $GITHUB_EVENT_PATH"
+      - name : machine echo ${{ github.event.name == 'push' }}
+        run : "echo ${{ github.event.name == 'push' }}"
+      - name : machine echo ${{ github.ref == 'refs/heads/master' }}
+        run : "echo ${{ github.ref == 'refs/heads/master' }}"
+      - name : machine echo ALL
+        run : "echo contains(matrix.os, 'latest') && contains(matrix.python-version, '3.9') && ${{ github.event.name == 'push' }} && ${{ github.ref == 'refs/heads/master' }}"
 
       - name: Push binaries
         if: contains(matrix.os, 'latest') && contains(matrix.python-version, '3.9') && ${{ github.event.name == 'push' }} && ${{ github.ref == 'refs/heads/master' }}
@@ -63,3 +65,5 @@ jobs:
           git config --global user.email $GH_USERNAME@users.noreply.github.com
           git config --global pull.rebase false
           git pull
+          git diff-index --quiet HEAD || git commit --allow-empty -m "Add ${{ matrix.os }} binaries"
+          git push
