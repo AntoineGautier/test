@@ -38,8 +38,8 @@ jobs:
           echo "contains(matrix.os, 'latest') && contains(matrix.python-version, '3.9') : $ALL_MAT"
         env:
           MERGED_RAW: ${{ github.event.pull_request.merged }}
-          ALLPAR: ${{ contains(matrix.os, 'latest') && contains(matrix.python-version, '3.9') && (github.event.pull_request.merged == true)}}
-          ALL: ${{ contains(matrix.os, 'latest') && contains(matrix.python-version, '3.9') && github.event.pull_request.merged == true }}
+          ALLPAR: (contains(matrix.os, 'latest') && contains(matrix.python-version, '3.9')) && (${{ github.event.name == 'push' }} && ${{ github.ref == 'refs/heads/master' }})"
+          ALL: contains(matrix.os, 'latest') && contains(matrix.python-version, '3.9') && ${{ github.event.name == 'push' }} && ${{ github.ref == 'refs/heads/master' }}"
           MERGED_TRUE_BOOL: ${{ github.event.pull_request.merged == true }}
           ALL_MAT: ${{ contains(matrix.os, 'latest') && contains(matrix.python-version, '3.9') }}
 
@@ -51,12 +51,10 @@ jobs:
         run : "echo $GITHUB_HEAD_REF"
       - name : machine echo $GITHUB_REF
         run : "echo $GITHUB_REF"
-      - name : machine echo ${{ github.event.name == 'push' }}
+      - name : machine echo 1
         run : "echo ${{ github.event.name == 'push' }}"
-      - name : machine echo ${{ github.ref == 'refs/heads/master' }}
+      - name : machine echo 2
         run : "echo ${{ github.ref == 'refs/heads/master' }}"
-      - name : machine echo ALL
-        run : "echo contains(matrix.os, 'latest') && contains(matrix.python-version, '3.9') && ${{ github.event.name == 'push' }} && ${{ github.ref == 'refs/heads/master' }}"
 
       - name: Push binaries
         if: contains(matrix.os, 'latest') && contains(matrix.python-version, '3.9') && ${{ github.event.name == 'push' }} && ${{ github.ref == 'refs/heads/master' }}
