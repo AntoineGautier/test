@@ -57,7 +57,7 @@ jobs:
         run : "echo $GITHUB_EVENT_PATH"
 
       - name: Push binaries
-        if: $GITHUB_EVENT_NAME == 'push' && $GITHUB_REF == 'master'
+        if: ${{ github.event.name == 'push' }} && ${{ github.ref == 'refs/heads/master' }}
         run: |
           git config --global user.name $GH_USERNAME
           git config --global user.email $GH_USERNAME@users.noreply.github.com
