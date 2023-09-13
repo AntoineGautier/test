@@ -1,0 +1,35 @@
+name: Test
+
+on: [push]
+
+env:
+  BUILD_TYPE: Release
+  GH_USERNAME: ${{ github.actor }}
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ['3.9']
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Push binaries
+        if: contains(matrix.os, 'latest') && contains(matrix.python-version, '3.9') && github.event.pull_request.merged
+        run: |
+          git config --global user.name $GH_USERNAME
+          git config --global user.email $GH_USERNAME@users.noreply.github.com
+          git config --global pull.rebase false
+          git pull
+          git add ${{ github.workspace }}/pyfunnel/lib
+          git diff-index --quiet HEAD || git commit -m "Add ${{ matrix.os }} binaries"
+          git push
