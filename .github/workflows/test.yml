@@ -51,4 +51,4 @@ jobs:
           github.event_name == 'push' &&
           github.ref == 'refs/heads/master'
         run: |
-          cmd /c "git diff-index --quiet HEAD || ( git commit -m 'Add ${{ matrix.os }} binaries') && pull && git push )"
+          cmd /c 'git diff-index --quiet HEAD || ( git commit -m 'Add ${{ matrix.os }} binaries') && pull && git push )'
