@@ -1,5 +1,6 @@
 name: Test
 
+
 on:
   pull_request:
     branches:
@@ -18,31 +19,12 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, windows-latest]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Debug
-        run: |
-          echo ${{ github.event_name == 'push' }}
-          echo ${{ github.event_name }}
-          echo ${{ github.ref }}
-
-      - name : machine echo $GITHUB_EVENT_NAME
-        run : "echo $GITHUB_EVENT_NAME"
-      - name : machine echo $GITHUB_BASE_REF
-        run : "echo $GITHUB_BASE_REF"
-      - name : machine echo $GITHUB_HEAD_REF
-        run : "echo $GITHUB_HEAD_REF"
-      - name : machine echo $GITHUB_REF
-        run : "echo $GITHUB_REF"
-      - name : machine echo 1
-        run : "echo ${{ github.event.name == 'push' }}"
-      - name : machine echo 2
-        run : "echo ${{ github.ref == 'refs/heads/master' }}"
-
-      - name: Push binaries
+      - name: Push Linux & macOS binaries
         if: |
           contains(matrix.os, 'latest') &&
           github.event_name == 'push' &&
@@ -51,6 +33,22 @@ jobs:
           git config --global user.name $GH_USERNAME
           git config --global user.email $GH_USERNAME@users.noreply.github.com
           git config --global pull.rebase false
-          git pull
-          git diff-index --quiet HEAD || git commit --allow-empty -m "Add ${{ matrix.os }} binaries"
-          git push
+          echo $GITHUB_SHA > commit.txt
+          git add ${{ github.workspace }}/commit.txt
+
+      - name: Push Linux & macOS binaries
+        if: |
+          (matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest') &&
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/master'
+        run: |
+          git diff-index --quiet HEAD || { git commit -m "Add ${{ matrix.os }} binaries" && git pull && git push; }
+
+      # We use cmd /c because powershell <7 does not support chain operators.
+      - name: Push Windows binaries
+        if: |
+          matrix.os == 'windows-latest' &&
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/master'
+        run: |
+          cmd /c "git diff-index --quiet HEAD || ( git commit -m 'Add ${{ matrix.os }} binaries') && pull && git push )"
