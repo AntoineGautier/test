@@ -33,8 +33,8 @@ jobs:
           git config --global user.name $GH_USERNAME
           git config --global user.email $GH_USERNAME@users.noreply.github.com
           git config --global pull.rebase false
-          echo $GITHUB_SHA > commit.txt
-          git add ${{ github.workspace }}/commit.txt
+          echo $GITHUB_SHA > ${{ matrix.os }}_commit.txt
+          git add ${{ github.workspace }}/${{ matrix.os }}_commit.txt
 
       - name: Push Linux & macOS binaries
         if: |
@@ -51,4 +51,4 @@ jobs:
           github.event_name == 'push' &&
           github.ref == 'refs/heads/master'
         run: |
-          cmd /c 'git diff-index --quiet HEAD || ( git commit -m 'Add ${{ matrix.os }} binaries') && pull && git push )'
+          cmd /c 'git diff-index --quiet HEAD || ( git commit -m "Add ${{ matrix.os }} binaries" && git pull && git push )'
