@@ -32,7 +32,7 @@ jobs:
         run: |
           git config --global user.name $GH_USERNAME
           git config --global user.email $GH_USERNAME@users.noreply.github.com
-          git config --global pull.rebase false
+          git config --global pull.rebase true
           echo $GITHUB_SHA > ${{ matrix.os }}_commit.txt
           git add ${{ github.workspace }}/${{ matrix.os }}_commit.txt
 
